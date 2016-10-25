@@ -8,7 +8,7 @@ import (
 	"github.com/jorgenschaefer/journalcheck/config"
 	"github.com/jorgenschaefer/journalcheck/emitter"
 	"github.com/jorgenschaefer/journalcheck/filter"
-	"github.com/jorgenschaefer/journalcheck/source"
+	"github.com/jorgenschaefer/journalcheck/journal"
 )
 
 func main() {
@@ -20,17 +20,19 @@ func main() {
 	consumer.Consume(entries)
 }
 
-func getProducer() *source.Producer {
-	var p *source.Producer
-	p = source.NewProducer()
-	if cursorfile, ok := config.GetCursorFile(); ok {
-		cursor, err := ioutil.ReadFile(cursorfile)
-		if err == nil {
+func getProducer() *journal.Producer {
+	p := journal.NewProducer()
+	if config.IsTestMode() {
+		p.SeekLast(uint64(config.GetDefaultEntryCount()))
+		p.Terminate = true
+		return p
+	} else if cursorfile, ok := config.GetCursorFile(); ok {
+		if cursor, err := ioutil.ReadFile(cursorfile); err == nil {
 			p.SeekCursor(string(cursor))
 			return p
 		}
 	}
-	p.SeekLast(uint64(config.GetDefaultEntryCount()))
+	p.SeekLast(0)
 	return p
 }
 

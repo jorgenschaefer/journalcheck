@@ -1,4 +1,4 @@
-package source
+package journal
 
 import (
 	"log"
@@ -7,19 +7,16 @@ import (
 )
 
 type Producer struct {
-	journal    *sdjournal.Journal
-	cursorFile *string
-	rewind     uint64
+	journal   *sdjournal.Journal
+	Terminate bool
 }
 
 func NewProducer() *Producer {
-	producer := new(Producer)
 	journal, err := sdjournal.NewJournal()
 	if err != nil {
 		log.Fatal(err)
 	}
-	producer.journal = journal
-	return producer
+	return &Producer{journal: journal}
 }
 
 func (p *Producer) SeekCursor(cursor string) {
@@ -38,7 +35,7 @@ func (p *Producer) SeekLast(rewind uint64) {
 	if err := p.journal.SeekTail(); err != nil {
 		log.Fatal(err)
 	}
-	_, err := p.journal.PreviousSkip(rewind)
+	_, err := p.journal.PreviousSkip(rewind + 1)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,8 +48,13 @@ func (p *Producer) Produce(entries chan *sdjournal.JournalEntry) {
 			log.Fatal(err)
 		}
 		if n == 0 {
-			p.journal.Wait(sdjournal.IndefiniteWait)
-			continue
+			if p.Terminate {
+				close(entries)
+				return
+			} else {
+				p.journal.Wait(sdjournal.IndefiniteWait)
+				continue
+			}
 		}
 		entry, err := p.journal.GetEntry()
 		if err != nil {

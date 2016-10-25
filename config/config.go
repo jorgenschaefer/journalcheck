@@ -1,13 +1,26 @@
 package config
 
 import (
+	"flag"
 	"os"
 	"strconv"
 	"time"
 )
 
+var flagTestMode = flag.Bool("t", false, "Test mode; emit unfiltered entries to standard output")
+var flagLastEntries = flag.Int("l", 100, "The `number` of entries to parse in test mode")
+var flagFilterFile = flag.String("f", "", "The filter `file` to use")
+
+func init() {
+	flag.Parse()
+}
+
 func GetFilterFile() (string, bool) {
-	return optionalEnvString("JOURNALCHECK_FILTERFILE")
+	if *flagFilterFile != "" {
+		return *flagFilterFile, true
+	} else {
+		return optionalEnvString("JOURNALCHECK_FILTERFILE")
+	}
 }
 
 func GetCursorFile() (string, bool) {
@@ -19,7 +32,7 @@ func GetRecipientAddress() (string, bool) {
 }
 
 func GetDefaultEntryCount() int {
-	return envIntDefault("JOURNALCHECK_DEFAULTENTRYCOUNT", 100)
+	return *flagLastEntries
 }
 
 func GetMaxEntriesPerBatch() int {
@@ -34,6 +47,10 @@ func GetMaxDelayPerBatch() time.Duration {
 func GetMaxWaitForEntries() time.Duration {
 	minutes := envIntDefault("JOURNALCHECK_WAITMINUTESFORENTRIES", 60)
 	return time.Duration(minutes) * time.Minute
+}
+
+func IsTestMode() bool {
+	return *flagTestMode
 }
 
 func optionalEnvString(name string) (string, bool) {
