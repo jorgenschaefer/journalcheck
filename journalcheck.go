@@ -32,6 +32,7 @@ func getProducer() *journal.Producer {
 			return p
 		}
 	}
+	// Not test mode, and cursor file was not readable
 	p.SeekLast(0)
 	return p
 }
@@ -53,8 +54,10 @@ func getConsumer() emitter.Emitter {
 }
 
 func getEmailEmitter(address string) emitter.Emitter {
-	e := emitter.NewEmailEmitter(address)
-	e.MaxLen = config.GetMaxEntriesPerBatch()
-	e.MaxDuration = config.GetMaxWaitForEntries()
+	e := emitter.NewBatchEmitter()
+	e.SetMaxEntries(config.MaxEntriesPerBatch())
+	e.SetMaxDelay(config.MaxDelayPerBatch())
+	e.SetMaxWait(config.MaxWaitForEntries())
+	e.SetBatchHandler(emitter.NewEmailSender(address))
 	return e
 }
