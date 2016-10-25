@@ -23,10 +23,10 @@ func main() {
 func getProducer() *journal.Producer {
 	p := journal.NewProducer()
 	if config.IsTestMode() {
-		p.SeekLast(uint64(config.GetDefaultEntryCount()))
+		p.SeekLast(uint64(config.DefaultEntryCount()))
 		p.Terminate = true
 		return p
-	} else if cursorfile, ok := config.GetCursorFile(); ok {
+	} else if cursorfile, ok := config.CursorFile(); ok {
 		if cursor, err := ioutil.ReadFile(cursorfile); err == nil {
 			p.SeekCursor(string(cursor))
 			return p
@@ -38,15 +38,15 @@ func getProducer() *journal.Producer {
 
 func getConsumer() emitter.Emitter {
 	var e emitter.Emitter
-	if address, ok := config.GetRecipientAddress(); ok {
+	if address, ok := config.RecipientAddress(); ok {
 		e = getEmailEmitter(address)
 	} else {
 		e = emitter.NewStdoutEmitter()
 	}
-	if filename, ok := config.GetFilterFile(); ok {
+	if filename, ok := config.FilterFile(); ok {
 		e.SetFilter(filter.NewRegexpFilter(filename))
 	}
-	if filename, ok := config.GetCursorFile(); ok {
+	if filename, ok := config.CursorFile(); ok {
 		e.SetCursorFile(filename)
 	}
 	return e

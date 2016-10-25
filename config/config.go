@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"log"
 	"os"
 	"strconv"
 	"time"
@@ -13,9 +14,13 @@ var flagFilterFile = flag.String("f", "", "The filter `file` to use")
 
 func init() {
 	flag.Parse()
+	_, ok := RecipientAddress()
+	if !IsTestMode() && !ok {
+		log.Fatal("Please either specify test mode (-t) or provide a recipient address")
+	}
 }
 
-func GetFilterFile() (string, bool) {
+func FilterFile() (string, bool) {
 	if *flagFilterFile != "" {
 		return *flagFilterFile, true
 	} else {
@@ -23,28 +28,28 @@ func GetFilterFile() (string, bool) {
 	}
 }
 
-func GetCursorFile() (string, bool) {
+func CursorFile() (string, bool) {
 	return optionalEnvString("JOURNALCHECK_CURSORFILE")
 }
 
-func GetRecipientAddress() (string, bool) {
+func RecipientAddress() (string, bool) {
 	return optionalEnvString("JOURNALCHECK_RECIPIENT")
 }
 
-func GetDefaultEntryCount() int {
+func DefaultEntryCount() int {
 	return *flagLastEntries
 }
 
-func GetMaxEntriesPerBatch() int {
+func MaxEntriesPerBatch() int {
 	return envIntDefault("JOURNALCHECK_MAXENTRIESPERBATCH", 1000)
 }
 
-func GetMaxDelayPerBatch() time.Duration {
+func MaxDelayPerBatch() time.Duration {
 	minutes := envIntDefault("JOURNALCHECK_MAXMINUTESPERBATCH", 60)
 	return time.Duration(minutes) * time.Minute
 }
 
-func GetMaxWaitForEntries() time.Duration {
+func MaxWaitForEntries() time.Duration {
 	minutes := envIntDefault("JOURNALCHECK_WAITMINUTESFORENTRIES", 60)
 	return time.Duration(minutes) * time.Minute
 }
