@@ -15,7 +15,7 @@ func NewEmailSender(address string) *EmailSender {
 }
 
 func (e *EmailSender) Send(batch []*sdjournal.JournalEntry) {
-	log.Printf("Sending %d entries\n", len(s.entries))
+	log.Printf("Sending %d entries\n", len(batch))
 	// sendmail := exec.Command("/usr/sbin/sendmail", s.recipient)
 	// stdin, err := sendmail.StdinPipe()
 	// if err != nil {

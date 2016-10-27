@@ -17,7 +17,7 @@ type BatchEmitter struct {
 	maxLen      int
 	maxDuration time.Duration
 	timeout     time.Duration
-	sender      func([]*sdjournal.JournalEntry)
+	sender      *EmailSender
 }
 
 func NewBatchEmitter() *BatchEmitter {
@@ -36,6 +36,22 @@ func (e *BatchEmitter) SetFilter(filter filter.Filter) {
 	e.filter = filter
 }
 
+func (e *BatchEmitter) SetMaxEntries(maxLen int) {
+	e.maxLen = maxLen
+}
+
+func (e *BatchEmitter) SetMaxDelay(maxDuration time.Duration) {
+	e.maxDuration = maxDuration
+}
+
+func (e *BatchEmitter) SetMaxWait(timeout time.Duration) {
+	e.timeout = timeout
+}
+
+func (e *BatchEmitter) SetBatchHandler(sender *EmailSender) {
+	e.sender = sender
+}
+
 func (e *BatchEmitter) Consume(entries chan *sdjournal.JournalEntry) {
 	var buffer = buffer.NewBuffer(e.maxLen)
 	var firstEntry time.Time
@@ -49,16 +65,18 @@ func (e *BatchEmitter) Consume(entries chan *sdjournal.JournalEntry) {
 				if buffer.IsEmpty() {
 					firstEntry = time.Now()
 				}
-				buffer, err := buffer.Append(entry)
+				newbuffer, err := buffer.Append(entry)
 				if err != nil {
 					log.Fatal(err)
 				}
+				buffer = newbuffer
 			}
 			lastCursor = entry.Cursor
 			haveCursor = true
 		}
-		if timeout || buffer.IsFull() {
-			e.sender(buffer)
+		age := time.Now().Sub(firstEntry)
+		if timeout || buffer.IsFull() || age > e.maxDuration {
+			e.sender.Send(buffer)
 			buffer.Clear()
 		}
 		if len(buffer) == 0 && haveCursor {
