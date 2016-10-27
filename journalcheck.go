@@ -1,63 +1,49 @@
 package main
 
 import (
-	"io/ioutil"
-
-	"github.com/coreos/go-systemd/sdjournal"
+	"log"
 
 	"github.com/jorgenschaefer/journalcheck/config"
-	"github.com/jorgenschaefer/journalcheck/emitter"
-	"github.com/jorgenschaefer/journalcheck/filter"
-	"github.com/jorgenschaefer/journalcheck/journal"
+	"github.com/jorgenschaefer/journalcheck/event"
+	"github.com/jorgenschaefer/journalcheck/notifier"
+	"github.com/jorgenschaefer/journalcheck/notifier/stdout"
+	"github.com/jorgenschaefer/journalcheck/source"
+	"github.com/jorgenschaefer/journalcheck/source/journal"
 )
 
 func main() {
-	producer := getProducer()
-	consumer := getConsumer()
+	source := getSource()
+	notifier := getNotifier()
 
-	entries := make(chan *sdjournal.JournalEntry)
-	go producer.Produce(entries)
-	consumer.Consume(entries)
+	eventstream := make(chan event.Event)
+	go source.Emit(eventstream)
+	notifier.Receive(eventstream)
 }
 
-func getProducer() *journal.Producer {
-	p := journal.NewProducer()
-	if config.IsTestMode() {
-		p.SeekLast(uint64(config.DefaultEntryCount()))
-		p.Terminate = true
-		return p
-	} else if cursorfile, ok := config.CursorFile(); ok {
-		if cursor, err := ioutil.ReadFile(cursorfile); err == nil {
-			p.SeekCursor(string(cursor))
-			return p
-		}
-	}
-	// Not test mode, and cursor file was not readable
-	p.SeekLast(0)
-	return p
-}
-
-func getConsumer() emitter.Emitter {
-	var e emitter.Emitter
-	if address, ok := config.RecipientAddress(); ok {
-		e = getEmailEmitter(address)
+func getSource() source.Source {
+	filterfile, ok := config.FilterFile()
+	var ff *string
+	if ok {
+		ff = &filterfile
 	} else {
-		e = emitter.NewStdoutEmitter()
+		ff = nil
 	}
-	if filename, ok := config.FilterFile(); ok {
-		e.SetFilter(filter.NewRegexpFilter(filename))
+	if config.IsTestMode() {
+		entryCount := config.DefaultEntryCount()
+		return journal.NewDelimitedSource(entryCount, ff)
+	} else {
+		cursorfile, ok := config.CursorFile()
+		if !ok {
+			log.Fatal("Please either specify test mode or provide a cursor file name")
+		}
+		return journal.NewCursorSource(cursorfile, ff)
 	}
-	if filename, ok := config.CursorFile(); ok {
-		e.SetCursorFile(filename)
-	}
-	return e
 }
 
-func getEmailEmitter(address string) emitter.Emitter {
-	e := emitter.NewBatchEmitter()
-	e.SetMaxEntries(config.MaxEntriesPerBatch())
-	e.SetMaxDelay(config.MaxDelayPerBatch())
-	e.SetMaxWait(config.MaxWaitForEntries())
-	e.SetBatchHandler(emitter.NewEmailSender(address))
-	return e
+func getNotifier() notifier.Notifier {
+	if _, ok := config.RecipientAddress(); ok {
+		panic("E-mail notifier not implemented yet")
+	} else {
+		return stdout.New()
+	}
 }

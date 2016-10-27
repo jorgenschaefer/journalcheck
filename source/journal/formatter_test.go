@@ -1,4 +1,4 @@
-package formatter
+package journal
 
 import "testing"
 import "github.com/coreos/go-systemd/sdjournal"
