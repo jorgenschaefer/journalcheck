@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"mime/quotedprintable"
+	"os"
+	"os/exec"
+	"time"
 
 	"github.com/jorgenschaefer/journalcheck/config"
 	"github.com/jorgenschaefer/journalcheck/journal"
@@ -97,11 +101,45 @@ func filter(unfilteredEntries, filteredEntries chan *journal.Entry) {
 }
 
 func sendmail(filteredEntries chan *journal.Entry, recipient string) {
-	count := 0
-	for _ = range filteredEntries {
-		count++
+	hostname, err := os.Hostname()
+	if err != nil {
+		hostname = "localhost"
 	}
-	fmt.Printf("Sent %d entries to %s\n", count, recipient)
+	cmd := exec.Command("/usr/sbin/sendmail", recipient)
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := cmd.Start(); err != nil {
+		log.Fatal(err)
+	}
+	mail := quotedprintable.NewWriter(stdin)
+	_, err = fmt.Fprintf(mail, `From: logcheck@%s
+To: %s
+Subject: Journalcheck at %s
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+MIME: 1.0
+
+This email is sent by journalcheck. If you no longer wish to receive
+such mail, you can either deinstall the journalcheck package or modify
+the configuration.
+
+`, hostname, recipient, time.Now().Format(time.RFC822))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for entry := range filteredEntries {
+		fmt.Fprintln(mail, entry.ShortString())
+	}
+
+	if err := stdin.Close(); err != nil {
+		log.Fatal(err)
+	}
+	if err := cmd.Wait(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func writeentries(filteredEntries chan *journal.Entry) {
