@@ -4,77 +4,53 @@ import (
 	"flag"
 	"log"
 	"os"
-	"strconv"
-	"time"
 )
 
-var flagTestMode = flag.Bool("t", false, "Test mode; emit unfiltered entries to standard output")
-var flagLastEntries = flag.Int("l", 100, "The `number` of entries to parse in test mode")
+var flagCursorFile = flag.String("c", "", "A `file` to store the last read cursor in")
+var flagNumEntries = flag.Int("n", 100, "The `number` of entries to parse in test mode")
 var flagFilterFile = flag.String("f", "", "The filter `file` to use")
+var flagOutputFormat = flag.String("o", "short", "Output format (one of: short, verbose, match)")
+var flagRecipient = flag.String("r", "", "Send e-mails to this e-mail `address`")
 
 func init() {
 	flag.Parse()
-	_, ok := RecipientAddress()
-	if !IsTestMode() && !ok {
-		log.Fatal("Please either specify test mode (-t) or provide a recipient address")
+	switch *flagOutputFormat {
+	case "short":
+	case "verbose":
+	case "match":
+		break
+	default:
+		log.Fatalf("Bad value for output format (-o): %s. Should be one of short, verbose or match", *flagOutputFormat)
 	}
 }
 
 func FilterFile() (string, bool) {
-	if *flagFilterFile != "" {
-		return *flagFilterFile, true
-	} else {
-		return optionalEnvString("JOURNALCHECK_FILTERFILE")
-	}
+	return optString(*flagFilterFile, "JOURNALCHECK_FILTERFILE")
 }
 
 func CursorFile() (string, bool) {
-	return optionalEnvString("JOURNALCHECK_CURSORFILE")
+	return optString(*flagCursorFile, "JOURNALCHECK_CURSORFILE")
 }
 
 func RecipientAddress() (string, bool) {
-	return optionalEnvString("JOURNALCHECK_RECIPIENT")
+	return optString(*flagRecipient, "JOURNALCHECK_RECIPIENT")
 }
 
-func DefaultEntryCount() int {
-	return *flagLastEntries
+func NumEntries() int {
+	return *flagNumEntries
 }
 
-func MaxEntriesPerBatch() int {
-	return envIntDefault("JOURNALCHECK_MAXENTRIESPERBATCH", 1000)
+func OutputFormat() string {
+	return *flagOutputFormat
 }
 
-func MaxDelayPerBatch() time.Duration {
-	minutes := envIntDefault("JOURNALCHECK_MAXMINUTESPERBATCH", 60)
-	return time.Duration(minutes) * time.Minute
-}
-
-func MaxWaitForEntries() time.Duration {
-	minutes := envIntDefault("JOURNALCHECK_WAITMINUTESFORENTRIES", 60)
-	return time.Duration(minutes) * time.Minute
-}
-
-func IsTestMode() bool {
-	return *flagTestMode
-}
-
-func optionalEnvString(name string) (string, bool) {
-	value := os.Getenv(name)
-	if value == "" {
-		return "", false
-	} else {
+func optString(option, envvar string) (string, bool) {
+	if option != "" {
+		return option, true
+	}
+	value := os.Getenv(envvar)
+	if value != "" {
 		return value, true
 	}
-}
-
-func envIntDefault(name string, def int) int {
-	value := os.Getenv(name)
-	if value == "" {
-		return def
-	}
-	if num, err := strconv.Atoi(value); err != nil {
-		return num
-	} else {
-		return def
-	}
+	return "", false
 }
