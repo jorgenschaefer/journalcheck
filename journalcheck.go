@@ -112,7 +112,7 @@ func sendmail(filteredEntries chan *journal.Entry, recipient string) {
 	_, err = fmt.Fprintf(mail, `From: logcheck@%s
 To: %s
 Subject: Journalcheck at %s
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 MIME: 1.0
 
