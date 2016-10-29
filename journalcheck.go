@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -53,7 +54,6 @@ func generate(unfilteredEntries chan *journal.Entry, finalCursor chan string) {
 			close(unfilteredEntries)
 			finalCursor <- entry.Cursor
 			close(finalCursor)
-			fmt.Println("FOO 1")
 			return
 		} else {
 			j.SeekCursor(string(cursor))
@@ -101,19 +101,14 @@ func filter(unfilteredEntries, filteredEntries chan *journal.Entry) {
 }
 
 func sendmail(filteredEntries chan *journal.Entry, recipient string) {
+	var b bytes.Buffer
+	var doSend bool = false
+
 	hostname, err := os.Hostname()
 	if err != nil {
 		hostname = "localhost"
 	}
-	cmd := exec.Command("/usr/sbin/sendmail", recipient)
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := cmd.Start(); err != nil {
-		log.Fatal(err)
-	}
-	mail := quotedprintable.NewWriter(stdin)
+	mail := quotedprintable.NewWriter(&b)
 	_, err = fmt.Fprintf(mail, `From: logcheck@%s
 To: %s
 Subject: Journalcheck at %s
@@ -131,9 +126,25 @@ the configuration.
 	}
 
 	for entry := range filteredEntries {
+		doSend = true
 		fmt.Fprintln(mail, format(entry))
 	}
 
+	if !doSend {
+		return
+	}
+
+	cmd := exec.Command("/usr/sbin/sendmail", recipient)
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := cmd.Start(); err != nil {
+		log.Fatal(err)
+	}
+	if _, err := b.WriteTo(stdin); err != nil {
+		log.Fatal(err)
+	}
 	if err := stdin.Close(); err != nil {
 		log.Fatal(err)
 	}
