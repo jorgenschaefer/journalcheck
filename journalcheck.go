@@ -131,7 +131,7 @@ the configuration.
 	}
 
 	for entry := range filteredEntries {
-		fmt.Fprintln(mail, entry.ShortString())
+		fmt.Fprintln(mail, format(entry))
 	}
 
 	if err := stdin.Close(); err != nil {
@@ -144,14 +144,7 @@ the configuration.
 
 func writeentries(filteredEntries chan *journal.Entry) {
 	for entry := range filteredEntries {
-		switch config.OutputFormat() {
-		case "short":
-			fmt.Println(entry.ShortString())
-		case "verbose":
-			fmt.Println(entry.VerboseString())
-		case "match":
-			fmt.Println(entry.MatchString())
-		}
+		fmt.Println(format(entry))
 	}
 }
 
@@ -162,5 +155,18 @@ func writeCursor(cursor string) {
 		if err != nil {
 			log.Fatal(err)
 		}
+	}
+}
+
+func format(entry *journal.Entry) string {
+	switch config.OutputFormat() {
+	case "short":
+		return entry.ShortString()
+	case "verbose":
+		return entry.VerboseString()
+	case "match":
+		return entry.MatchString()
+	default:
+		panic("Can't happen, should be checked in config")
 	}
 }
