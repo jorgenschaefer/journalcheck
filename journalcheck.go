@@ -86,12 +86,12 @@ func filter(unfilteredEntries, filteredEntries chan *journal.Entry) {
 			filteredEntries <- entry
 		}
 	} else {
-		m := matcher.New(filterfile)
+		m, err := matcher.New(filterfile)
+		if err != nil {
+			log.Fatal(err)
+		}
 		for entry := range unfilteredEntries {
-			matches, err := m.Matches(entry.MatchString())
-			if err != nil {
-				log.Fatal(err)
-			}
+			matches := m.Matches(entry.MatchString())
 			if !matches {
 				filteredEntries <- entry
 			}
