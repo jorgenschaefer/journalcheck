@@ -1,0 +1,7 @@
+[Unit]
+Description=Journal Check
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/default/journalcheck
+ExecStart=/opt/journalcheck/bin/journalcheck

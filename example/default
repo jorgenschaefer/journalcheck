@@ -1,0 +1,3 @@
+JOURNALCHECK_CURSORFILE=/opt/journalcheck/var/cursor
+JOURNALCHECK_FILTERFILE=/opt/journalcheck/etc/filters.txt
+JOURNALCHECK_RECIPIENT=root
