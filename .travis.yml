@@ -1,0 +1,6 @@
+language: go
+sudo: no
+addons:
+  apt:
+    packages:
+      - libsystemd-dev
