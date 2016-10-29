@@ -1,3 +1,7 @@
+// Package config encapsulates journalcheck's configuration options.
+// As journalcheck can be configured both using command line arguments
+// and environment variables, this package provides simple accessor
+// functions that return the value.
 package config
 
 import (
@@ -24,22 +28,32 @@ func init() {
 	}
 }
 
-func FilterFile() (string, bool) {
+// FilterFile returns the name of the file containing filter rules.
+// If no such option was given, ok will be false.
+func FilterFile() (filename string, ok bool) {
 	return optString(*flagFilterFile, "JOURNALCHECK_FILTERFILE")
 }
 
+// CursorFile returns the name of the file journalcheck should use for
+// the cursor. If no such option was given, ok will be false.
 func CursorFile() (string, bool) {
 	return optString(*flagCursorFile, "JOURNALCHECK_CURSORFILE")
 }
 
+// RecipientAddress returns the e-mail address to be used for sending
+// notification mails. If no such option was given, ok will be false.
 func RecipientAddress() (string, bool) {
 	return optString(*flagRecipient, "JOURNALCHECK_RECIPIENT")
 }
 
+// NumEntries returns the number of entries to show in the interactive
+// use case.
 func NumEntries() int {
 	return *flagNumEntries
 }
 
+// OutputFormat returns the format to use for formatting journal
+// entries on output.
 func OutputFormat() string {
 	return *flagOutputFormat
 }
