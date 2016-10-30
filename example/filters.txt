@@ -1,90 +1,72 @@
-^(cron.service|cron|CRON): pam_unix\(cron:session\): session closed for user
-^(cron.service|CRON): \(root\) CMD \(cd / && run-parts --report \/etc\/cron.hourly\)$
-^CRON: \(root\) CMD \(test -x /usr/sbin/anacron \|\| \( cd / && run-parts --report /etc/cron.weekly \)\)$
-^cron.service: \(CRON\) INFO \(pidfile fd = [0-9]+\)$
-^cron.service: \(CRON\) INFO \(Running @reboot jobs\)$
-^cron.service: \([^ ]+\) CMD \(.*\)$
-^cron.service: pam_unix\(cron:session\): session opened for user [^ ]+ by \(uid=[0-9]+\)$
-^cron.service: \(root\) CMD \(test -x /usr/bin/certbot && perl -e 'sleep int\(rand\(3600\)\)' && certbot -q renew\)$
-^cron.service: \(root\) CMD \(test -x /usr/sbin/anacron \|\| \( cd / && run-parts --report /etc/cron.daily \)\)$
-^crontab: \([^ ]+\) END EDIT \([^ ]+\)$
-^crontab: \([^ ]+\) REPLACE \([^ ]+\)$
-^emacs.service:
-^fail2ban.service: Starting authentication failure monitor: fail2ban\.$
-^fail2ban.service: Stopping authentication failure monitor: fail2ban\.$
-^kbd.service: Setting console screen modes and fonts\.$
-^networking.service: Configuring network interfaces\.\.\.Waiting for DAD\.\.\. Done$
-^networking.service: done\.
-^nullmailer.service: Delivery complete, 0 message\(s\) remain\.$
-^nullmailer.service: Rescanning queue\.$
-^nullmailer.service: Sent file\.$
-^nullmailer.service: smtp: Succeeded:
-^nullmailer.service: Starting delivery, [0-9]+ message\(s\) in queue\.$
-^nullmailer.service: Starting delivery:
-^nullmailer.service: Starting mail-transfer-agent: nullmailer\.$
-^nullmailer.service: Stopping mail-transfer-agent: nullmailer\.$
-^nullmailer.service: Trigger pulled\.$
-^sh: \(root\) CMD \(cd / && run-parts --report /etc/cron\.hourly\)$
-^smtpproxy.service: Client disconnected;
-^smtpproxy.service: Error: client spoke before its turn;
-^smtpproxy.service: Error: DNSBL check positive;
-^smtpproxy.service: Error: error reading mail data;
-^smtpproxy.service: Error: missing sender;
-^smtpproxy.service: Error reading from client;
-^smtpproxy.service: Error: relay access denied;
-^smtpproxy.service: Error: writing server greeting;
-^smtpproxy.service: New connection;
-^smtpproxy.service: SMTP proxy started;
-^smtpproxy.service: unknown command;
+^ansible-[^:]*:
+^cron:
+^CRON:
+^crontab:
+^dbus: \[system\] Activating via systemd: service name='org\.freedesktop\.hostname1' unit='dbus-org\.freedesktop\.hostname1\.service'$
+^dbus: \[system\] Successfully activated service 'org\.freedesktop\.hostname1'$
+^dbus: \[system\] Successfully activated service 'org\.freedesktop\.systemd1'$
+^emacs:
+^kbd: Setting console screen modes and fonts\.$
+^networking: Configuring network interfaces\.\.\.Waiting for DAD\.\.\. Done$
+^networking: done\.$
+^nullmailer: Delivery complete, 0 message\(s\) remain\.$
+^nullmailer: Rescanning queue\.$
+^nullmailer: Sent file\.$
+^nullmailer: smtp: Succeeded:
+^nullmailer: Starting delivery, [0-9]+ message\(s\) in queue\.$
+^nullmailer: Starting delivery:
+^nullmailer: Starting mail-transfer-agent: nullmailer\.$
+^nullmailer: Stopping mail-transfer-agent: nullmailer\.$
+^nullmailer: Trigger pulled\.$
+^smtpproxy: Client disconnected;
+^smtpproxy: Error: client spoke before its turn;
+^smtpproxy: Error: DNSBL check positive;
+^smtpproxy: Error: duplicate MAIL command;
+^smtpproxy: Error: error reading mail data;
+^smtpproxy: Error: missing sender;
+^smtpproxy: Error reading from client;
+^smtpproxy: Error: relay access denied;
+^smtpproxy: Error: writing server greeting;
+^smtpproxy: New connection;
+^smtpproxy: SMTP proxy started;
+^sshd: Accepted password for
+^sshd: Accepted publickey for
+^sshd: Address [^ ]+ maps to [^ ]+, but this does not map back to the address - POSSIBLE BREAK-IN ATTEMPT!$
+^sshd: Bad protocol version identification
 ^sshd: Connection closed by
+^sshd: Did not receive identification string from
+^sshd: error: Received disconnect from
 ^sshd: Exiting on signal 15$
+^sshd: Failed (none|password) for invalid user
+^sshd: fatal: Read from socket failed: Connection reset by peer \[preauth\]$
+^sshd: input_userauth_request: invalid user
+^sshd: Invalid user [^ ]+ from
 ^sshd: PAM 2 more authentication failures;
+^sshd: pam_unix\(sshd:auth\): authentication failure;
+^sshd: pam_unix\(sshd:auth\): check pass; user unknown
 ^sshd: pam_unix\(sshd:session\): session closed for user
-^sshd: Received disconnect from [0-9a-f:.]+: 11: disconnected by user$
+^sshd: pam_unix\(sshd:session\): session closed for user
+^sshd: pam_unix\(sshd:session\): session opened for user
+^sshd: pam_unix\(sshd:session\): session opened for user
+^sshd: Received disconnect from
+^sshd: Received SIGHUP; restarting\.$
 ^sshd: Received signal 15; terminating\.$
-^ssh.service: Accepted password for [^ ]+ from
-^ssh.service: Accepted publickey for [^ ]+ from
-^ssh.service: Address .* maps to .*, but this does not map back to the address - POSSIBLE BREAK-IN ATTEMPT!$
-^(ssh.service|sshd): Bad protocol version identification
-^ssh.service: Connection closed by
-^ssh.service: \+ /dev/pts/[0-9]+ root:nobody$
-^ssh.service: Did not receive identification string from
-^ssh.service: error: Received disconnect from
-^ssh.service: Failed [^ ]+ for invalid user
-^ssh.service: fatal: Read from socket failed: Connection reset by peer \[preauth\]$
-^ssh.service: \([^ ]+\) BEGIN EDIT \([^ ]+\)$
-^ssh.service: \([^ ]+\) LIST \([^ ]+\)$
-^ssh.service: [^ ]+ : TTY=[^ ]+ ; PWD=[^ ]+ ; USER=[^ ]+ ; COMMAND=
-^ssh.service: [^ ]+ : unknown user: [^ ]+$
-^ssh.service: [^ ]+ : \(command continued\)
-^ssh.service: input_userauth_request: invalid user .* \[preauth\]$
-^ssh.service: Invalid user [^ ]+ from
-^ssh.service: PAM 2 more authentication failures;
-^ssh.service: pam_unix\(sshd:auth\): authentication failure;
-^ssh.service: pam_unix\(sshd:auth\): check pass; user unknown$
-^ssh.service: pam_unix\(sshd:session\): session closed for user
-^ssh.service: pam_unix\(sshd:session\): session opened for user
-^ssh.service: pam_unix\(sshd:session\): session opened for user
-^ssh.service: pam_unix\(sudo:auth\): authentication failure;
-^ssh.service: pam_unix\(sudo:auth\): conversation failed$
-^ssh.service: pam_unix\(sudo:session\): session closed for user
-^ssh.service: pam_unix\(sudo:session\): session closed for user
-^ssh.service: pam_unix\(sudo:session\): session opened for user
-^ssh.service: pam_unix\(sudo:session\): session opened for user
-^ssh.service: pam_unix\(su:session\): session closed for user
-^ssh.service: pam_unix\(su:session\): session opened for user
-^ssh.service: Received disconnect from
-^ssh.service: Received SIGHUP; restarting\.$
-^ssh.service: Received signal 15; terminating\.$
-^ssh.service: Server listening on
-^ssh.service: Successful su for
-^ssh.service: User [^ ]+ from [^ ]+ not allowed because not listed in AllowUsers$
+^sshd: Server listening on 0.0.0.0 port 22\.$
+^sshd: Server listening on :: port 22\.$
+^sshd: syslogin_perform_logout: logout\(\) returned an error$
+^sshd: User root from [^ ]+ not allowed because not listed in AllowUsers$
+^su:
+^sudo: [^ ]+ : \(command continued\)
+^sudo: [^ ]+ : TTY=
+^sudo: pam_unix\(sudo:session\): session closed for user
 ^sudo: pam_unix\(sudo:session\): session closed for user
 ^sudo: pam_unix\(sudo:session\): session opened for user
+^sudo: pam_unix\(sudo:session\): session opened for user
+^sudo: pam_unix\(sudo:session\): session opened for user
 ^su: pam_unix\(su:session\): session closed for user
-^systemd-journald.service: Journal started$
-^systemd-journald.service: Journal stopped$
-^systemd-journald.service: Permanent journal is using
-^systemd-journald.service: Runtime journal is using
-^systemd-journald.service: Time spent on flushing to /var is
-^vzquota.service: /etc/init\.d/vzquota: 15: \[: 0: unexpected operator$
+^su: pam_unix\(su:session\): session opened for user
+^su: Successful su for
+^systemd-journald\.service: Journal started$
+^systemd-journald\.service: Permanent journal is using
+^systemd-journald.service: Time spent on flushing to
+^vzquota: /etc/init\.d/vzquota: 15: \[: 0: unexpected operator$
