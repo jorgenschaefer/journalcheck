@@ -73,7 +73,7 @@ func (j *Journal) Next() (entry *Entry, err error) {
 // name is not available, this falls back to the command, and if that
 // is also not available, the syslog identifier.
 func (e *Entry) MatchString() string {
-	identifier := getFirst(e.Fields, "_SYSTEMD_UNIT", "_COMM", "SYSLOG_IDENTIFIER")
+	identifier := getFirst(e.Fields, "SYSLOG_IDENTIFIER", "_SYSTEMD_UNIT", "_COMM")
 	message := e.Fields["MESSAGE"]
 	return fmt.Sprintf("%s: %s", identifier, message)
 }
@@ -83,7 +83,7 @@ func (e *Entry) MatchString() string {
 func (e *Entry) ShortString() string {
 	logtime := time.Unix(int64(e.RealtimeTimestamp/1000/1000), 0).Format(time.Stamp)
 	host := getFirst(e.Fields, "_HOSTNAME")
-	identifier := getFirst(e.Fields, "_SYSTEMD_UNIT", "_COMM", "SYSLOG_IDENTIFIER")
+	identifier := getFirst(e.Fields, "SYSLOG_IDENTIFIER", "_SYSTEMD_UNIT", "_COMM")
 	pid := getFirst(e.Fields, "SYSLOG_PID", "_PID")
 	message := e.Fields["MESSAGE"]
 	return fmt.Sprintf("%s %s %s[%s]: %s", logtime, host, identifier, pid, message)
