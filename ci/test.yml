@@ -6,4 +6,4 @@ inputs:
   - name: journalcheck-source
     path: gopath/src/github.com/jorgenschaefer/journalcheck
 run:
-  path: journalcheck-source/bin/ci-test.sh
+  path: gopath/src/github.com/jorgenschaefer/journalcheck/bin/ci-test.sh

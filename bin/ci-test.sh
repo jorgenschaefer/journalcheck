@@ -1,7 +1,8 @@
 #!/bin/sh
 
+export GOPATH="$(pwd/gopath)"
+
 cd "$(dirname "$0")"/..
-export GOPATH="$(pwd)/../../../../gopath"
 
 go get .
 go test ./...
