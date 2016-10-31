@@ -1,6 +1,9 @@
 package journal
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestMatchString(t *testing.T) {
 	// Given an entry with a syslog identifier
@@ -36,7 +39,8 @@ func TestShortString(t *testing.T) {
 		"SYSLOG_PID":        "12345",
 		"_PID":              "54321",
 	}
-	e := &Entry{Fields: fields, RealtimeTimestamp: 1477764000 * 1000 * 1000}
+	ts := time.Date(2016, 10, 29, 20, 0, 0, 0, time.Local).UnixNano() / 1000
+	e := &Entry{Fields: fields, RealtimeTimestamp: uint64(ts)}
 	// Then the match string should include the syslog identifier
 	expectEqual(t, "Oct 29 20:00:00 testhost test[12345]: This is a test", e.ShortString())
 	// Given an entry without the syslog identifier
