@@ -4,5 +4,6 @@ image_resource:
   source: {repository: golang}
 inputs:
   - name: journalcheck-source
+    path: gopath/src/github.com/jorgenschaefer/journalcheck
 run:
   path: journalcheck-source/bin/ci-test.sh

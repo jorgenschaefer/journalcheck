@@ -1,11 +1,7 @@
 #!/bin/sh
 
-cd "$(dirname "$0")"/../..
+cd "$(dirname "$0")"/..
+export GOPATH="$(pwd)/../../../../gopath"
 
-mkdir gopath
-export GOPATH="$(pwd)/gopath"
-mkdir -p "$GOPATH/src/github.com/jorgenschaefer"
-ln -s "$(pwd)/journalcheck-source" "$GOPATH/src/github.com/jorgenschaefer/"
-
-cd journalcheck-source/
 go get .
+go test ./...
