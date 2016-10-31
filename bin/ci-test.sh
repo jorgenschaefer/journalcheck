@@ -1,4 +1,4 @@
-#!/bin/ci
+#!/bin/sh
 
 cd "$(dirname "$0")"/../..
 
