@@ -5,6 +5,7 @@ package journal
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/coreos/go-systemd/sdjournal"
@@ -85,7 +86,7 @@ func (e *Entry) ShortString() string {
 	host := getFirst(e.Fields, "_HOSTNAME")
 	identifier := getFirst(e.Fields, "SYSLOG_IDENTIFIER", "_SYSTEMD_UNIT", "_COMM")
 	pid := getFirst(e.Fields, "SYSLOG_PID", "_PID")
-	message := e.Fields["MESSAGE"]
+	message := strings.Replace(e.Fields["MESSAGE"], "\n", " ", -1)
 	return fmt.Sprintf("%s %s %s[%s]: %s", logtime, host, identifier, pid, message)
 }
 

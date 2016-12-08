@@ -41,20 +41,29 @@ func TestShortString(t *testing.T) {
 	}
 	ts := time.Date(2016, 10, 29, 20, 0, 0, 0, time.Local).UnixNano() / 1000
 	e := &Entry{Fields: fields, RealtimeTimestamp: uint64(ts)}
-	// Then the match string should include the syslog identifier
+	// Then the short string should include the syslog identifier
 	expectEqual(t, "Oct 29 20:00:00 testhost test[12345]: This is a test", e.ShortString())
+
 	// Given an entry without the syslog identifier
 	delete(fields, "SYSLOG_IDENTIFIER")
-	// Then the match string should include the systemd unit
+	// Then the short string should include the systemd unit
 	expectEqual(t, "Oct 29 20:00:00 testhost test.service[12345]: This is a test", e.ShortString())
+
 	// Given an entry without a syslog PID
 	delete(fields, "SYSLOG_PID")
-	// Then the entry should use _PID
+	// Then the short string should use _PID
 	expectEqual(t, "Oct 29 20:00:00 testhost test.service[54321]: This is a test", e.ShortString())
+
 	// Given an entry without a systemd unit, but a command
 	delete(fields, "_SYSTEMD_UNIT")
-	// Then the match string should include the command
+	// Then the short string should include the command
 	expectEqual(t, "Oct 29 20:00:00 testhost /bin/test[54321]: This is a test", e.ShortString())
+
+	// Given an entry with newlines
+	fields["MESSAGE"] = "This is a test\nwith\nnewlines"
+	// Then the short string should use spaces instead of the
+	// newline
+	expectEqual(t, "Oct 29 20:00:00 testhost /bin/test[54321]: This is a test with newlines", e.ShortString())
 }
 
 func expectEqual(t *testing.T, expected, actual string) {
